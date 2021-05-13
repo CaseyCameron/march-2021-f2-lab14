@@ -33,6 +33,7 @@ describe('API Routes', () => {
       id: expect.any(Number),
       task: 'lab14',
       completed: false,
+      shared: false,
     };
 
     it('posts to /api/todos', async () => {
@@ -44,40 +45,43 @@ describe('API Routes', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
-
     });
 
     it('gets from/api/me/todos', async () => {
-      const response =  
-        await request.get('/api/me/todos')
-          .set('Authorization', user.token);
+      const response = await request
+        .get('/api/me/todos')
+        .set('Authorization', user.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
       todo = response.body;
     });
 
-
     it('puts into /api/todos/:id/completed', async () => {
       todo.completed = todo.completed ? false : true;
-      const response =  
-        await request.put(`/api/todos/${todo.id}/completed`)
-          .set('Authorization', user.token)
-          .send(todo);
+      const response = await request
+        .put(`/api/todos/${todo.id}/completed`)
+        .set('Authorization', user.token)
+        .send(todo);
       expect(response.status).toBe(200);
-    
       expect(response.body).toEqual(todo);
     });
- 
+
+    it('puts into /api/todos/:id/shared', async () => {
+      todo.shared = todo.shared ? false : true;
+      const response = await request
+        .put(`/api/todos/${todo.id}/shared`)
+        .set('Authorization', user.token)
+        .send(todo);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(todo);
+    });
 
     it('deletes from /api/todos/:id', async () => {
-      const response =  
-        await request.delete(`/api/todos/${todo.id}`)
-          .set('Authorization', user.token);
+      const response = await request
+        .delete(`/api/todos/${todo.id}`)
+        .set('Authorization', user.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
     });
   });
-
-  
-
 });

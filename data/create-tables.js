@@ -19,6 +19,7 @@ async function run() {
         id SERIAL PRIMARY KEY NOT NULL,
         task VARCHAR(512) NOT NULL,
         completed BOOLEAN DEFAULT FALSE NOT NULL,
+        shared BOOLEAN DEFAULT FALSE NOT NULL,
         user_id INTEGER NOT NULL REFERENCES users(id)
       );
     `);
