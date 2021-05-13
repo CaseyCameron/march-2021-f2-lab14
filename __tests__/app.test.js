@@ -47,7 +47,7 @@ describe('API Routes', () => {
       expect(response.body).toEqual(todo);
     });
 
-    it('gets from/api/me/todos', async () => {
+    it('gets from /api/me/todos', async () => {
       const response = await request
         .get('/api/me/todos')
         .set('Authorization', user.token);
@@ -74,6 +74,14 @@ describe('API Routes', () => {
         .send(todo);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
+    });
+
+    it('gets from /api/todos', async () => {
+      const response = await request
+        .get('/api/todos')
+        .set('Authorization', user.token);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ ...todo, userName: user.name });
     });
 
     it('deletes from /api/todos/:id', async () => {
