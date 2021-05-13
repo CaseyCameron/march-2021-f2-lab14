@@ -53,11 +53,12 @@ describe('API Routes', () => {
           .set('Authorization', user.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
+      todo = response.body;
     });
 
     it('deletes from /api/todos/:id', async () => {
       const response =  
-        await request.del('/api/todos/:id')
+        await request.delete(`/api/todos/${todo.id}`)
           .set('Authorization', user.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
