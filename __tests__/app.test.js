@@ -44,14 +44,23 @@ describe('API Routes', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
+
     });
 
-    it.skip('gets from /api/todos', async () => {
-      const response = await (
+    it('gets from /api/todos', async () => {
+      const response =  
         await request.get('/api/todos')
-      ).set('Authorization', user.token);
+          .set('Authorization', user.token);
       expect(response.status).toBe(200);
-      // expect(response.body).toEqual(?);
+      expect(response.body).toEqual(todo);
+    });
+
+    it('deletes from /api/todos/:id', async () => {
+      const response =  
+        await request.del('/api/todos/:id')
+          .set('Authorization', user.token);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(todo);
     });
   });
 });
