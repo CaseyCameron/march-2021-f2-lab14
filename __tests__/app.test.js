@@ -56,6 +56,19 @@ describe('API Routes', () => {
       todo = response.body;
     });
 
+
+    it('puts into /api/todos/:id/completed', async () => {
+      todo.completed = todo.completed ? false : true;
+      const response =  
+        await request.put(`/api/todos/${todo.id}/completed`)
+          .set('Authorization', user.token)
+          .send(todo);
+      expect(response.status).toBe(200);
+    
+      expect(response.body).toEqual(todo);
+    });
+ 
+
     it('deletes from /api/todos/:id', async () => {
       const response =  
         await request.delete(`/api/todos/${todo.id}`)
@@ -64,4 +77,7 @@ describe('API Routes', () => {
       expect(response.body).toEqual(todo);
     });
   });
+
+  
+
 });
