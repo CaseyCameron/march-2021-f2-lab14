@@ -4,21 +4,16 @@ import client from '../lib/client.js';
 run();
 
 async function run() {
-
   try {
-    
     await client.query(`
       DROP TABLE IF EXISTS users CASCADE;
-      DROP TABLE IF EXISTS cats;
+      DROP TABLE IF EXISTS todos;
     `);
 
     console.log('drop tables complete');
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err);
-  }
-  finally {
+  } finally {
     client.end();
   }
-    
 }

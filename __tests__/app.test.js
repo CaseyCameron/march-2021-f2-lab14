@@ -6,24 +6,21 @@ import { execSync } from 'child_process';
 const request = supertest(app);
 
 describe('API Routes', () => {
-
   afterAll(async () => {
     return client.end();
   });
 
-  describe('/api/cats', () => {
+  describe('/api/todos', () => {
     let user;
 
     beforeAll(async () => {
       execSync('npm run recreate-tables');
 
-      const response = await request
-        .post('/api/auth/signup')
-        .send({
-          name: 'Me the User',
-          email: 'me@user.com',
-          password: 'password'
-        });
+      const response = await request.post('/api/auth/signup').send({
+        name: 'Me the User',
+        email: 'me@user.com',
+        password: 'password',
+      });
 
       expect(response.status).toBe(200);
 
@@ -32,16 +29,29 @@ describe('API Routes', () => {
 
     // append the token to your requests:
     //  .set('Authorization', user.token);
-    
-    it('VERB to /api/route [with context]', async () => {
-      
-      // remove this line, here to not have lint error:
-      user.token;
-    
-      // expect(response.status).toBe(200);
-      // expect(response.body).toEqual(?);
-      
+    let todo = {
+      id: expect.any(Number),
+      task: 'lab14',
+      completed: false,
+    };
+
+    it('posts to /api/todos', async () => {
+      todo.userId = user.id;
+      const response = await request
+        .post('/api/todos')
+        .set('Authorization', user.token)
+        .send(todo);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(todo);
     });
 
+    it.skip('gets from /api/todos', async () => {
+      const response = await (
+        await request.get('/api/todos')
+      ).set('Authorization', user.token);
+      expect(response.status).toBe(200);
+      // expect(response.body).toEqual(?);
+    });
   });
 });
