@@ -47,9 +47,9 @@ describe('API Routes', () => {
 
     });
 
-    it('gets from /api/todos', async () => {
+    it('gets from/api/me/todos', async () => {
       const response =  
-        await request.get('/api/todos')
+        await request.get('/api/me/todos')
           .set('Authorization', user.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo);
