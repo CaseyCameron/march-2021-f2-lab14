@@ -11,20 +11,31 @@ describe('API Routes', () => {
   });
 
   describe('/api/todos', () => {
-    let user;
+    let user1;
+    let user2;
 
     beforeAll(async () => {
       execSync('npm run recreate-tables');
 
-      const response = await request.post('/api/auth/signup').send({
-        name: 'Me the User',
-        email: 'me@user.com',
+      const response1 = await request.post('/api/auth/signup').send({
+        name: 'Me the User1',
+        email: 'me@user1.com',
         password: 'password',
       });
 
-      expect(response.status).toBe(200);
+      const response2 = await request.post('/api/auth/signup').send({
+        name: 'Me the User2',
+        email: 'me@user2.com',
+        password: 'password',
+      });
 
-      user = response.body;
+      expect(response1.status).toBe(200);
+
+      
+      expect(response2.status).toBe(200);
+      user1 = response1.body;
+      user2 = response2.body;
+      
     });
 
     // append the token to your requests:
@@ -51,28 +62,28 @@ describe('API Routes', () => {
     };
 
     it('posts to /api/todos', async () => {
-      todo1.userId = user.id;
+      todo1.userId = user1.id;
       const response1 = await request
         .post('/api/todos')
-        .set('Authorization', user.token)
+        .set('Authorization', user1.token)
         .send(todo1);
 
       expect(response1.status).toBe(200);
       expect(response1.body).toEqual(todo1);
 
-      todo2.userId = user.id;
+      todo2.userId = user1.id;
       const response2 = await request
         .post('/api/todos')
-        .set('Authorization', user.token)
+        .set('Authorization', user1.token)
         .send(todo2);
 
       expect(response2.status).toBe(200);
       expect(response2.body).toEqual(todo2);
 
-      todo3.userId = user.id;
+      todo3.userId = user2.id;
       const response3 = await request
         .post('/api/todos')
-        .set('Authorization', user.token)
+        .set('Authorization', user2.token)
         .send(todo3);
 
       expect(response3.status).toBe(200);
@@ -80,19 +91,26 @@ describe('API Routes', () => {
     });
 
     it('gets from /api/me/todos', async () => {
-      const response = await request
+      const response1 = await request
         .get('/api/me/todos')
-        .set('Authorization', user.token);
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual([todo1, todo2, todo3]);
-      [todo1, todo2, todo3] = response.body;
+        .set('Authorization', user1.token);
+      expect(response1.status).toBe(200);
+      expect(response1.body).toEqual([todo1, todo2]);
+      [todo1, todo2] = response1.body;
+      const response2 = await request
+        .get('/api/me/todos')
+        .set('Authorization', user2.token);
+      expect(response2.status).toBe(200);
+      expect(response2.body).toEqual([todo3]);
+
+      [todo3] = response2.body;
     });
 
     it('puts into /api/todos/:id/completed', async () => {
       todo1.completed = todo1.completed ? false : true;
       const response = await request
         .put(`/api/todos/${todo1.id}/completed`)
-        .set('Authorization', user.token)
+        .set('Authorization', user1.token)
         .send(todo1);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo1);
@@ -102,7 +120,7 @@ describe('API Routes', () => {
       todo2.shared = todo2.shared ? false : true;
       const response = await request
         .put(`/api/todos/${todo2.id}/shared`)
-        .set('Authorization', user.token)
+        .set('Authorization', user1.token)
         .send(todo2);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo2);
@@ -111,20 +129,30 @@ describe('API Routes', () => {
     it('gets from /api/todos', async () => {
       const response = await request
         .get('/api/todos')
-        .set('Authorization', user.token);
+        .set('Authorization', user1.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(
         expect.arrayContaining([
-          { ...todo2, userName: user.name },
-          { ...todo3, userName: user.name },
+          { ...todo2, userName: user1.name },
+          { ...todo3, userName: user2.name },
         ])
       );
     });
+    it('does not put into /api/todos/:id/completed', async () => {
+      todo1.completed = todo1.completed ? false : true;
+      const response = await request
+        .put(`/api/todos/${todo1.id}/completed`)
+        .set('Authorization', user2.token)
+        .send(todo1);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual('');
+    });
+   
 
     it('deletes from /api/todos/:id', async () => {
       const response = await request
         .delete(`/api/todos/${todo2.id}`)
-        .set('Authorization', user.token);
+        .set('Authorization', user1.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo2);
     });
