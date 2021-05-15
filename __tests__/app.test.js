@@ -22,24 +22,18 @@ describe('API Routes', () => {
         email: 'me@user1.com',
         password: 'password',
       });
+      expect(response1.status).toBe(200);
+      user1 = response1.body;
 
       const response2 = await request.post('/api/auth/signup').send({
         name: 'Me the User2',
         email: 'me@user2.com',
         password: 'password',
       });
-
-      expect(response1.status).toBe(200);
-
-      
       expect(response2.status).toBe(200);
-      user1 = response1.body;
       user2 = response2.body;
-      
     });
 
-    // append the token to your requests:
-    //  .set('Authorization', user.token);
     let todo1 = {
       id: expect.any(Number),
       task: 'lab14',
@@ -138,16 +132,26 @@ describe('API Routes', () => {
         ])
       );
     });
+
     it('does not put into /api/todos/:id/completed', async () => {
       todo1.completed = todo1.completed ? false : true;
       const response = await request
         .put(`/api/todos/${todo1.id}/completed`)
         .set('Authorization', user2.token)
         .send(todo1);
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual('');
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Unauthorized access' });
     });
-   
+
+    it('does not put into /api/todos/:id/shared', async () => {
+      todo1.shared = todo1.shared ? false : true;
+      const response = await request
+        .put(`/api/todos/${todo1.id}/shared`)
+        .set('Authorization', user2.token)
+        .send(todo1);
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Unauthorized access' });
+    });
 
     it('deletes from /api/todos/:id', async () => {
       const response = await request
@@ -155,6 +159,14 @@ describe('API Routes', () => {
         .set('Authorization', user1.token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(todo2);
+    });
+
+    it('does not delete from /api/todos/:id', async () => {
+      const response = await request
+        .delete(`/api/todos/${todo3.id}`)
+        .set('Authorization', user1.token);
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Unauthorized access' });
     });
   });
 });
